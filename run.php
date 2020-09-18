@@ -9,7 +9,7 @@
 /**
  * Config
  */
-define("BOT_TOKEN", "ISI_DISINI");
+define("BOT_TOKEN", "ISI DISINI");
 define("SLEEP_IN_MINUTES", 5); //looping setiap 5 menit
 
 date_default_timezone_set("Asia/Jakarta");
@@ -195,6 +195,7 @@ class prakerja extends curl{
             );
             
             $context  = stream_context_create($opts);
+            send_again:
             $send_message = file_get_contents($endpoint, false, $context);
     
             $json = json_decode($send_message);
@@ -202,6 +203,8 @@ class prakerja extends curl{
                 echo "(i) ".date('H:i:s')." Message has been sent to ".$chat_id."\n";
             } else {
                 echo "(!) ".date('H:i:s')." Message hasn't sent to ".$chat_id."\n";
+                sleep(5);
+                goto send_again;
             }
         }
     }
@@ -214,7 +217,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.0';
+$version = '1.1';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -259,12 +262,11 @@ foreach ($list as $value) {
         $login = $prakerja->login($email, $password);
         if(isset($login->data->token)){
             $auth_token = $login->data->token;
+            detail_again:
             $user_details = $prakerja->user_details($auth_token);
             if($user_details->success == false){
-                $fh = fopen('akun.CSV', 'a');
-                fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
-                fclose($fh);
-                continue;  
+                sleep(5);
+                goto detail_again; 
             }
         } else {
             if(is_numeric(strpos($login->message, 'Anda melakukan kesalahan terlalu banyak'))){
@@ -290,12 +292,11 @@ foreach ($list as $value) {
     $user_fullname = $user_details->data->name;
     $isJoinBatch = $user_details->data->isJoinBatch;    
 
+    batch_again:
     $batch = $prakerja->batch($auth_token);
     if($batch->success == false){
-        $fh = fopen('akun.CSV', 'a');
-        fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
-        fclose($fh);
-        continue;
+        sleep(5);
+        goto batch_again;
     }
 
     $already_join_batch = $batch->data->already_join_batch;
@@ -327,33 +328,32 @@ foreach ($list as $value) {
         }
 
         // Sertifikat
+        cert_again:
         $cert = $prakerja->certificate($auth_token);
         if($cert->success == false){
-            $fh = fopen('akun.CSV', 'a');
-            fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
-            fclose($fh);
-            continue;
+            sleep(5);
+            goto cert_again;
         }
         if(count($cert->data->certification) >= 1 && $cert_user_count[$user_id] <> count($cert->data->certification)){
-            $no=1;$text ="Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut daftar sertifikat kamu pada dashboard prakerja:\n";
+            $no_cert=1;$text ="Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut daftar sertifikat kamu pada dashboard prakerja:\n";
             foreach ($cert->data->certification as $certification) {
-                $text = $text."[".$no++."] ".$certification->course_name." (".$certification->institute_name.")\n";
+                $text = $text."[".$no_cert++."] ".$certification->course_name." (".$certification->institute_name.")\n";
             }
+            unset($no_cert);
             $prakerja->send_message($token, $chat_id_array, $text);
         }
         $cert_user_count[$user_id] = count($cert->data->certification);
 
         // Insentif 
+        incent_again:
         $incentive = $prakerja->incentive($auth_token);
         if($incentive->success == false){
-            $fh = fopen('akun.CSV', 'a');
-            fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
-            fclose($fh);
-            continue;
+            sleep(5);
+            goto incent_again;
         }
         if(count($incentive->data->items) >=1){
             
-            $no=1; 
+            $no_jd=1; 
             unset($text);
             if($incentive_user[$user_id] != count($incentive->data->items)){
                 $text = "Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut informasi jadwal insentif kamu:\n";
@@ -385,13 +385,13 @@ foreach ($list as $value) {
                 $status_incentive[$user_id][$all_incentive->code] = $all_incentive->status;
 
                 if($incentive_user[$user_id] != count($incentive->data->items)){
-                    $text = $text."[".$no++."] Rp. ".number_format($all_incentive->amount)." - ".date_format(date_create($all_incentive->due_date), 'd M Y')."\n";
-                }
-                
+                    $text = $text."[".$no_jd++."] Rp. ".number_format($all_incentive->amount)." - ".date_format(date_create($all_incentive->due_date), 'd M Y')." - ".$incentive_status."\n";
+                }  
             }
             $incentive_user[$user_id] = count($incentive->data->items);
             if(isset($text)){
                 $prakerja->send_message($token, $chat_id_array, $text);
+                unset($no_jd);
             }
         }
         
