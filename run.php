@@ -210,6 +210,23 @@ class prakerja extends curl{
 $prakerja = new prakerja();
 $token = BOT_TOKEN;
 
+/**
+ * Running
+ */
+echo "Checking for Updates...";
+$version = '1.0';
+check_update:
+$json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
+echo "\r\r                       ";
+if(isset($json_ver->version)) {
+    if($version != $json_ver->version) {
+        echo "\n".$json_ver->msg."\n\n";
+        die();
+    }
+} else {
+    goto check_update;
+}
+
 start:
 if(file_exists("all_akun.CSV")) {
     $list = explode("\n",str_replace("\r","",file_get_contents("all_akun.CSV")));
