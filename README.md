@@ -1,3 +1,11 @@
+## Auto Notifikasi 24 Hours - PHP CLI
+**Fitur Notifikasi :**
+- Lolos/Gagal Pendaftaran Gelombang
+- Nomor/Saldo Prakerja nongol
+- Sertifikat nongol di dashboard
+- Jadwal insentif nongol
+- Perubahan setiap status pencairan insentif (Belum diproses, diproses, berhasil, gagal, etc..)
+
 ## Langkah 1: Buat Bot Telegram
 Step ini bisa googling untuk selanjutnya mendapatkan bot token dan chat_id
 
@@ -23,3 +31,4 @@ ketik command berikut:
 ## Screenshoot:
 
 ![Running](https://i.imgur.com/dheEAgz.png)
+![Running](https://i.imgur.com/ftk8nI8.png)
