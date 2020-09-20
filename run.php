@@ -233,6 +233,7 @@ if(isset($json_ver->version)) {
         echo "\n".$json_ver->msg."\n\n";
         die();
     }
+	echo "\n";
 } else {
     goto check_update;
 }
