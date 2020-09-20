@@ -19,3 +19,7 @@ ketik command berikut:
 ## Langkah 5: Running 
 ketik command berikut:
 - `php run.php`
+
+## Screenshoot:
+
+![Running](https://i.imgur.com/dheEAgz.png)
