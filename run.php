@@ -5,6 +5,8 @@
  * @release 2020
  * @author eco.nxn
  */
+date_default_timezone_set("Asia/Jakarta"); //WIB
+error_reporting(0);
 
 /**
  * Config
@@ -20,8 +22,6 @@ if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
     $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
 }
 
-date_default_timezone_set("Asia/Jakarta"); //WIB
-error_reporting(0);
 class curl {
 	private $ch, $result, $error;
 	
