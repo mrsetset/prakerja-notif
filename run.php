@@ -12,7 +12,15 @@
 define("BOT_TOKEN", "ISI DISINI");
 define("SLEEP_IN_MINUTES", 5); //looping setiap 5 menit
 
-date_default_timezone_set("Asia/Jakarta");
+if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
+    $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
+} elseif(date('G') <= 15) { //rule jam 6 pagi - 3 sore
+    $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
+} else { //rule jam 3 sore - 12 malam
+    $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
+}
+
+date_default_timezone_set("Asia/Jakarta"); //WIB
 error_reporting(0);
 class curl {
 	private $ch, $result, $error;
@@ -23,7 +31,7 @@ class curl {
 	 * @param string $method HTTP request method
 	 * @param string $url API request URL
 	 * @param array $param API request data
-     * @param array $header API request header
+     	 * @param array $header API request header
 	 */
 	public function request ($method, $url, $param, $header) {
 		curl:
@@ -45,7 +53,6 @@ class curl {
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($this->ch, CURLOPT_TIMEOUT, 20);
-        // curl_setopt($this->ch, CURLOPT_VERBOSE, true);
         $this->result = curl_exec($this->ch);
         $this->error = curl_error($this->ch);
         if($this->error) {
@@ -109,7 +116,7 @@ class prakerja extends curl{
     }
 
     /**
-     * detail akun
+     * list gelombang
      */
     function batch($auth_token) { 
 
@@ -217,7 +224,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.1';
+$version = '1.2';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -339,7 +346,6 @@ foreach ($list as $value) {
             foreach ($cert->data->certification as $certification) {
                 $text = $text."[".$no_cert++."] ".$certification->course_name." (".$certification->institute_name.")\n";
             }
-            unset($no_cert);
             $prakerja->send_message($token, $chat_id_array, $text);
         }
         $cert_user_count[$user_id] = count($cert->data->certification);
@@ -391,7 +397,6 @@ foreach ($list as $value) {
             $incentive_user[$user_id] = count($incentive->data->items);
             if(isset($text)){
                 $prakerja->send_message($token, $chat_id_array, $text);
-                unset($no_jd);
             }
         }
         
@@ -410,8 +415,8 @@ if(file_exists('akun.CSV')){
     sleep(2);
     rename('akun.CSV', 'all_akun.CSV');
 }
-echo "\nSleep....";
-$minutes = SLEEP_IN_MINUTES; //minutes
+
+echo "\nSleep ".$minutes." minutes..";
 sleep(60*$minutes);
 print "\n\n".chr(27).chr(91).'H'.chr(27).chr(91).'J'."\n";
 goto start;
