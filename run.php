@@ -12,15 +12,7 @@ error_reporting(0);
  * Config
  */
 define("BOT_TOKEN", "ISI DISINI");
-define("SLEEP_IN_MINUTES", 5); //looping setiap 5 menit
-
-if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
-    $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
-} elseif(date('G') <= 15) { //rule jam 6 pagi - 3 sore
-    $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
-} else { //rule jam 3 sore - 12 malam
-    $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
-}
+define("SLEEP_IN_MINUTES", 5); //looping setiap 5 menit di jam normal
 
 class curl {
 	private $ch, $result, $error;
@@ -417,6 +409,13 @@ if(file_exists('akun.CSV')){
     rename('akun.CSV', 'all_akun.CSV');
 }
 
+if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
+    $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
+} elseif(date('G') <= 15) { //rule jam 6 pagi - 3 sore
+    $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
+} else { //rule jam 3 sore - 12 malam
+    $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
+}
 echo "\nSleep ".$minutes." minutes..";
 sleep(60*$minutes);
 print "\n\n".chr(27).chr(91).'H'.chr(27).chr(91).'J'."\n";
