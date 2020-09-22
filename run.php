@@ -421,9 +421,9 @@ if(file_exists('akun.CSV')){
 
 if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
     $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
-} elseif(date('G') <= 15) { //rule jam 6 pagi - 3 sore
+} elseif(date('G') <= 17) { //rule jam 6 pagi - 5 sore
     $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
-} else { //rule jam 3 sore - 12 malam
+} else { //rule jam 5 sore - 12 malam
     $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
 }
 echo "\nSleep ".$minutes." minutes..";
