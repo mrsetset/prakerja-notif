@@ -216,7 +216,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.2';
+$version = '1.3';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -307,6 +307,16 @@ foreach ($list as $value) {
             $prakerja->send_message($token, $chat_id_array, $text);
         }
         $status_lolos[$user_id] = "gagal";
+        
+        $fh = fopen('akun.CSV', 'a');
+        fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
+        fclose($fh);
+    } elseif($isJoinBatch == 0 && !isset($batch->data->items) && $already_join_batch == "Y"){
+        if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "calon_lolos"){
+            $text = "Program Prakerja\n\nHi ".$user_fullname.",\nYay! Pendaftaran Prakerja pada gelombang pilihanmu SEDANG DI EVALUASI namun kemungkinan besar kamu AKAN LOLOS. Tunggu info selanjutnya ya!";
+            $prakerja->send_message($token, $chat_id_array, $text);
+        }
+        $status_lolos[$user_id] = "calon_lolos";
         
         $fh = fopen('akun.CSV', 'a');
         fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
