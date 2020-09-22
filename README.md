@@ -23,6 +23,7 @@ ketik command berikut:
 - Buka dan Edit skrip `run.php`
 - Perhatikan `congif` pada baris skrip paling atas
 - Isi telegram bot token kamu pada tulisan **ISI DISINI**
+- (Opsional) Waktu jeda defaultnya per 5 menit sekali di jam normal 6 pagi - 5 sore dan selebihnya akan diperlambat 2-3 kali, bisa juga di ubah di bagian nilai **SLEEP_IN_MINUTES**
 
 ## Langkah 5: Running 
 ketik command berikut:
