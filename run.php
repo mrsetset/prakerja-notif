@@ -388,7 +388,7 @@ foreach ($list as $value) {
                         $incentive_status = "Gagal";
                     break;
                 }
-                if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $all_incentive->status){
+                if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $incentive_status){
                     $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->due_date), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status dari ".strtoupper($status_incentive[$user_id][$all_incentive->code])." menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
                 }
                 $status_incentive[$user_id][$all_incentive->code] = $incentive_status;
