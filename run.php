@@ -216,7 +216,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.3';
+$version = '1.4';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -301,7 +301,7 @@ foreach ($list as $value) {
 
     $already_join_batch = $batch->data->already_join_batch;
 
-    if($isJoinBatch == 0 && $already_join_batch == "X"){
+    if(!empty($user_id) && $isJoinBatch == 0 && $already_join_batch == "X"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "gagal"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nMaaf! Kamu BELUM LOLOS Pendaftaran Prakerja pada gelombang pilihanmu.";
             $prakerja->send_message($token, $chat_id_array, $text);
@@ -311,7 +311,7 @@ foreach ($list as $value) {
         $fh = fopen('akun.CSV', 'a');
         fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
         fclose($fh);
-    } elseif($isJoinBatch == 0 && !isset($batch->data->items) && $already_join_batch == "Y"){
+    } elseif(!empty($user_id) && $isJoinBatch == 0 && !isset($batch->data->items) && $already_join_batch == "Y"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "calon_lolos"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nYay! Pendaftaran Prakerja pada gelombang pilihanmu SEDANG DI EVALUASI namun kemungkinan besar kamu AKAN LOLOS. Tunggu info selanjutnya ya!";
             $prakerja->send_message($token, $chat_id_array, $text);
@@ -321,7 +321,7 @@ foreach ($list as $value) {
         $fh = fopen('akun.CSV', 'a');
         fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
         fclose($fh);
-    } elseif($isJoinBatch == 1 && $already_join_batch == "Y"){
+    } elseif(!empty($user_id) && $isJoinBatch == 1 && $already_join_batch == "Y"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "lolos"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nYay! Kamu LOLOS Pendaftaran Prakerja pada gelombang pilihanmu.";
             $prakerja->send_message($token, $chat_id_array, $text);
@@ -389,7 +389,7 @@ foreach ($list as $value) {
                     break;
                 }
                 if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $all_incentive->status){
-                    $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->due_date), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
+                    $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->due_date), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status dari ".strtoupper($status_incentive[$user_id][$all_incentive->code])." menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
                 }
                 $status_incentive[$user_id][$all_incentive->code] = $all_incentive->status;
 
@@ -421,9 +421,9 @@ if(file_exists('akun.CSV')){
 
 if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
     $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
-} elseif(date('G') <= 17) { //rule jam 6 pagi - 5 sore
+} elseif(date('G') <= 17) { //rule jam 6 pagi - 3 sore
     $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
-} else { //rule jam 5 sore - 12 malam
+} else { //rule jam 3 sore - 12 malam
     $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
 }
 echo "\nSleep ".$minutes." minutes..";
