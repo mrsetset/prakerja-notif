@@ -216,7 +216,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.4';
+$version = '1.5';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -391,7 +391,7 @@ foreach ($list as $value) {
                 if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $all_incentive->status){
                     $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->due_date), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status dari ".strtoupper($status_incentive[$user_id][$all_incentive->code])." menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
                 }
-                $status_incentive[$user_id][$all_incentive->code] = $all_incentive->status;
+                $status_incentive[$user_id][$all_incentive->code] = $incentive_status;
 
                 if($incentive_user[$user_id] != count($incentive->data->items)){
                     $text = $text."[".$no_jd++."] Rp. ".number_format($all_incentive->amount)." - ".date_format(date_create($all_incentive->due_date), 'd M Y')." - ".$incentive_status."\n";
