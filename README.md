@@ -32,3 +32,4 @@ ketik command berikut:
 
 ![Running](https://i.imgur.com/dheEAgz.png)
 ![Running](https://i.imgur.com/ftk8nI8.png)
+![Running](https://i.imgur.com/hrW44TV.png)
