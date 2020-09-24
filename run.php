@@ -12,7 +12,7 @@ error_reporting(0);
  * Config
  */
 define("BOT_TOKEN", "ISI DISINI");
-define("SLEEP_IN_MINUTES", 5); //looping setiap 5 menit di jam normal
+define("SLEEP_IN_MINUTES", 3); //looping setiap 3 menit
 
 class curl {
 	private $ch, $result, $error;
@@ -103,6 +103,27 @@ class prakerja extends curl{
         $json = json_decode($detail);
         if(isset($json->message)){
             echo "[i] ".date('H:i:s')." userDetails Msg: ".$json->message."\n";
+        }
+        return $json;         
+    }
+
+    /**
+     * saldo
+     */
+    function balance($auth_token) { 
+
+        $method   = 'GET';
+        $header[] = 'Origin: https://dashboard.prakerja.go.id';
+        $header[] = 'Referer: https://dashboard.prakerja.go.id/';
+        $header[] = 'Authorization: '.$auth_token;
+
+        $endpoint = '/api/v1/tr/transaction/balance';
+        
+        $balance = $this->request ($method, $endpoint, $param=NULL, $header); 
+
+        $json = json_decode($balance);
+        if(isset($json->message)){
+            echo "[i] ".date('H:i:s')." Balance Msg: ".$json->message."\n";
         }
         return $json;         
     }
@@ -216,7 +237,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.5';
+$version = '1.6';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -334,6 +355,20 @@ foreach ($list as $value) {
                 $text = "Program Prakerja\n\nHi ".$user_fullname.",\nNomor Prakerja kamu adalah ".$user_details->data->noPrakerja."\n";
                 $prakerja->send_message($token, $chat_id_array, $text);
                 $noPrakerja[$user_id] = $user_details->data->noPrakerja;
+            }
+
+            //Saldo
+            balance_again:
+            $balance = $prakerja->balance($auth_token);
+            if($balance->success == false){
+                sleep(5);
+                goto balance_again;
+            }
+            
+            if(isset($balance->data->balance) && $saldo[$user_id] != $balance->data->balance){
+                $text = "Program Prakerja\n\nHi ".$user_fullname.",\nSaldo Prakerja kamu sekarang adalah Rp. ".number_format($balance->data->balance)."\n";
+                $prakerja->send_message($token, $chat_id_array, $text);
+                $saldo[$user_id] = $balance->data->balance;
             }
         }
 
