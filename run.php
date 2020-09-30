@@ -400,12 +400,12 @@ foreach ($list as $value) {
             goto survey_again;
         }
         if(isset($survey->data->scheme_id)){
-            if($survey[$user_id] != $survey->data->status){
+            if($survey_check[$user_id] != "Y"){
                 $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nSurvei Evaluasi Program Kartu Prakerja telah Tersedia untuk Diisi untuk mendapatkan Insentif Rp.50.000.");
-                $survey[$user_id] = false;
+                $survey_check[$user_id] = "Y";
             }   
         } else {
-            $survey[$user_id] = false;
+            $survey_check[$user_id] = "N";
         }
 
         // Sertifikat
