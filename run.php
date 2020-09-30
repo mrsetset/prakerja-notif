@@ -127,7 +127,27 @@ class prakerja extends curl{
         }
         return $json;         
     }
+    
+    /**
+     * survey
+     */
+    function survey($auth_token) { 
 
+        $method   = 'GET';
+        $header[] = 'Origin: https://dashboard.prakerja.go.id';
+        $header[] = 'Referer: https://dashboard.prakerja.go.id/';
+        $header[] = 'Authorization: '.$auth_token;
+
+        $endpoint = '/api/v1/survey-incentive/check';
+        
+        $survey = $this->request ($method, $endpoint, $param=NULL, $header); 
+
+        $json = json_decode($survey);
+        if(isset($json->message)){
+            echo "[i] ".date('H:i:s')." Survey Msg: ".$json->message."\n";
+        }
+        return $json;         
+    }
     /**
      * list gelombang
      */
@@ -237,7 +257,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.6';
+$version = '1.7';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -372,6 +392,22 @@ foreach ($list as $value) {
             }
         }
 
+        //Survey check
+        survey_again:
+        $survey = $prakerja->survey($auth_token);
+        if($survey->success == false){
+            sleep(5);
+            goto survey_again;
+        }
+        if(isset($survey->data->scheme_id)){
+            if($survey[$user_id] != $survey->data->status){
+                $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nSurvei Evaluasi Program Kartu Prakerja telah Tersedia untuk Diisi untuk mendapatkan Insentif Rp.50.000.");
+                $survey[$user_id] = false;
+            }   
+        } else {
+            $survey[$user_id] = false;
+        }
+
         // Sertifikat
         cert_again:
         $cert = $prakerja->certificate($auth_token);
@@ -405,22 +441,31 @@ foreach ($list as $value) {
             foreach ($incentive->data->items as $all_incentive) {
                 switch($all_incentive->status){
                     case"1":
-                        $incentive_status = "Belum Diproses";
+                        $incentive_status = "Menunggu Diproses";
                     break;
                     case"2":
-                        $incentive_status = "Sedang Diproses";
+                        $incentive_status = "Dijadwalkan";
                     break;
                     case"3":
-                        $incentive_status = "Berhasil";
+                        $incentive_status = "Berhasil Ditransfer";
+                    break;
+                    case"4":
+                        $incentive_status = "Dana Tertahan";
                     break;
                     case"5":
                         $incentive_status = "Sedang Diproses";
                     break;
+                    case"6":
+                        $incentive_status = "Rekening Tidak Ditemukan";
+                    break;
+                    case"7":
+                        $incentive_status = "E-wallet Belum KYC";
+                    break;
+                    case"8":
+                        $incentive_status = "Membutuhkan Ulasan Pelatihan";
+                    break;
                     case"9":
                         $incentive_status = "Dalam Pengecekan";
-                    break;
-                    default:
-                        $incentive_status = "Gagal";
                     break;
                 }
                 if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $incentive_status){
