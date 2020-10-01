@@ -1,13 +1,14 @@
 ## Auto Notifikasi 24 Hours - PHP CLI
 **Fitur Notifikasi :**
-- Lolos/Gagal Pendaftaran Gelombang
-- Nomor/Saldo Prakerja nongol
+- Pengumuman Lolos/Gagal Pendaftaran Gelombang
+- Nomor dan Saldo Prakerja nongol
 - Sertifikat nongol di dashboard
 - Jadwal insentif nongol
 - Perubahan setiap status pencairan insentif (Belum diproses, diproses, berhasil, gagal, etc..)
+- Survey Evaluasi untuk mendapatkan insentif Rp 50.000
 
 ## Langkah 1: Buat Bot Telegram
-Step ini bisa googling untuk selanjutnya mendapatkan bot token dan chat_id
+Step ini bisa googling untuk selanjutnya mendapatkan bot token dan chat_id penerima notifikasi
 
 ## Langkah 2: Cloning repo
 ketik command berikut:
@@ -23,7 +24,7 @@ ketik command berikut:
 - Buka dan Edit skrip `run.php`
 - Perhatikan `congif` pada baris skrip paling atas
 - Isi telegram bot token kamu pada tulisan **ISI DISINI**
-- (Opsional) Waktu jeda defaultnya per 5 menit sekali di jam normal 6 pagi - 5 sore dan selebihnya akan diperlambat 2-3 kali, bisa juga di ubah di bagian nilai **SLEEP_IN_MINUTES**
+- (Opsional) Waktu jeda defaultnya per 3 menit sekali di jam normal 6 pagi - 5 sore dan selebihnya akan diperlambat 2-3 kali, bisa juga di ubah di bagian nilai **SLEEP_IN_MINUTES**
 
 ## Langkah 5: Running 
 ketik command berikut:
