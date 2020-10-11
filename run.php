@@ -257,7 +257,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.7';
+$version = '1.8';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -298,6 +298,7 @@ foreach ($list as $value) {
 
     echo "[".$no++."] ".date('H:i:s')." | Email: ".$email."\n";
 
+    user_detail:
     $user_details = $prakerja->user_details($auth_token);
     if($user_details->success == false){
         $login = $prakerja->login($email, $password);
@@ -336,6 +337,9 @@ foreach ($list as $value) {
     batch_again:
     $batch = $prakerja->batch($auth_token);
     if($batch->success == false){
+        if(is_numeric(strpos(strtolower($batch->message), "token"))){
+            goto user_detail;
+        }
         sleep(5);
         goto batch_again;
     }
@@ -381,6 +385,9 @@ foreach ($list as $value) {
             balance_again:
             $balance = $prakerja->balance($auth_token);
             if($balance->success == false){
+                if(is_numeric(strpos(strtolower($balance->message), "token"))){
+                    goto user_detail;
+                }
                 sleep(5);
                 goto balance_again;
             }
@@ -396,6 +403,9 @@ foreach ($list as $value) {
         survey_again:
         $survey = $prakerja->survey($auth_token);
         if($survey->success == false){
+            if(is_numeric(strpos(strtolower($survey->message), "token"))){
+                goto user_detail;
+            }
             sleep(5);
             goto survey_again;
         }
@@ -412,6 +422,9 @@ foreach ($list as $value) {
         cert_again:
         $cert = $prakerja->certificate($auth_token);
         if($cert->success == false){
+            if(is_numeric(strpos(strtolower($cert->message), "token"))){
+                goto user_detail;
+            }
             sleep(5);
             goto cert_again;
         }
@@ -428,6 +441,9 @@ foreach ($list as $value) {
         incent_again:
         $incentive = $prakerja->incentive($auth_token);
         if($incentive->success == false){
+            if(is_numeric(strpos(strtolower($incentive->message), "token"))){
+                goto user_detail;
+            }
             sleep(5);
             goto incent_again;
         }
