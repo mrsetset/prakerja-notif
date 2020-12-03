@@ -12,7 +12,7 @@ error_reporting(0);
  * Config
  */
 define("BOT_TOKEN", "ISI DISINI");
-define("SLEEP_IN_MINUTES", 3); //looping setiap 3 menit
+define("SLEEP_IN_MINUTES", 3); //dicek setiap 3 menit
 
 class curl {
 	private $ch, $result, $error;
@@ -23,7 +23,7 @@ class curl {
 	 * @param string $method HTTP request method
 	 * @param string $url API request URL
 	 * @param array $param API request data
-     	 * @param array $header API request header
+     * @param array $header API request header
 	 */
 	public function request ($method, $url, $param, $header) {
 		curl:
@@ -257,7 +257,7 @@ $token = BOT_TOKEN;
  * Running
  */
 echo "Checking for Updates...";
-$version = '1.8';
+$version = '1.9';
 check_update:
 $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
 echo "\r\r                       ";
@@ -271,6 +271,7 @@ if(isset($json_ver->version)) {
     goto check_update;
 }
 
+$ns=1;
 start:
 if(file_exists("all_akun.CSV")) {
     $list = explode("\n",str_replace("\r","",file_get_contents("all_akun.CSV")));
@@ -279,6 +280,7 @@ if(file_exists("all_akun.CSV")) {
     die();
 }
 
+$day = date('d-m-Y');
 $no=1;
 foreach ($list as $value) {
     if(empty($value)) {
@@ -295,6 +297,16 @@ foreach ($list as $value) {
     $email = $exp_acc[1];
     $password = $exp_acc[2];
     $auth_token = $exp_acc[3];
+
+    if(isset($day) && $day != date('d-m-Y') && date('G') >= 6){
+        $json_ver = json_decode(file_get_contents('https://bangeko.com/app_ver/prakerja.json'));
+        if(isset($json_ver->version)) {
+            if($version != $json_ver->version) {
+                $prakerja->send_message($token, $chat_id_array, $json_ver->msg);
+            }
+        }
+        $day = date('d-m-Y');
+    }
 
     echo "[".$no++."] ".date('H:i:s')." | Email: ".$email."\n";
 
@@ -349,7 +361,9 @@ foreach ($list as $value) {
     if(!empty($user_id) && $isJoinBatch == 0 && $already_join_batch == "X"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "gagal"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nMaaf! Kamu BELUM LOLOS Pendaftaran Prakerja pada gelombang pilihanmu.";
-            $prakerja->send_message($token, $chat_id_array, $text);
+            if($ns > 1){
+                $prakerja->send_message($token, $chat_id_array, $text);
+            }
         }
         $status_lolos[$user_id] = "gagal";
         
@@ -359,7 +373,9 @@ foreach ($list as $value) {
     } elseif(!empty($user_id) && $isJoinBatch == 0 && !isset($batch->data->items) && $already_join_batch == "Y"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "calon_lolos"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nYay! Pendaftaran Prakerja pada gelombang pilihanmu SEDANG DI EVALUASI namun kemungkinan besar kamu AKAN LOLOS. Tunggu info selanjutnya ya!";
-            $prakerja->send_message($token, $chat_id_array, $text);
+            if($ns > 1){
+                $prakerja->send_message($token, $chat_id_array, $text);
+            }
         }
         $status_lolos[$user_id] = "calon_lolos";
         
@@ -369,7 +385,9 @@ foreach ($list as $value) {
     } elseif(!empty($user_id) && $isJoinBatch == 1 && $already_join_batch == "Y"){
         if(!isset($status_lolos[$user_id]) || $status_lolos[$user_id] != "lolos"){
             $text = "Program Prakerja\n\nHi ".$user_fullname.",\nYay! Kamu LOLOS Pendaftaran Prakerja pada gelombang pilihanmu.";
-            $prakerja->send_message($token, $chat_id_array, $text);
+            if($ns > 1){
+                $prakerja->send_message($token, $chat_id_array, $text);
+            }
         }
         $status_lolos[$user_id] = "lolos";
 
@@ -377,7 +395,9 @@ foreach ($list as $value) {
         if(!empty($user_details->data->noPrakerja)){
             if($noPrakerja[$user_id] != $user_details->data->noPrakerja){
                 $text = "Program Prakerja\n\nHi ".$user_fullname.",\nNomor Prakerja kamu adalah ".$user_details->data->noPrakerja."\n";
-                $prakerja->send_message($token, $chat_id_array, $text);
+                if($ns > 1){
+                    $prakerja->send_message($token, $chat_id_array, $text);
+                }
                 $noPrakerja[$user_id] = $user_details->data->noPrakerja;
             }
 
@@ -394,7 +414,9 @@ foreach ($list as $value) {
             
             if(isset($balance->data->balance) && $saldo[$user_id] != $balance->data->balance){
                 $text = "Program Prakerja\n\nHi ".$user_fullname.",\nSaldo Prakerja kamu sekarang adalah Rp. ".number_format($balance->data->balance)."\n";
-                $prakerja->send_message($token, $chat_id_array, $text);
+                if($ns > 1){
+                    $prakerja->send_message($token, $chat_id_array, $text);
+                }
                 $saldo[$user_id] = $balance->data->balance;
             }
         }
@@ -411,7 +433,9 @@ foreach ($list as $value) {
         }
         if(isset($survey->data->scheme_id)){
             if($survey_check[$user_id] != "Y"){
-                $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nSurvei Evaluasi Program Kartu Prakerja telah Tersedia untuk Diisi untuk mendapatkan Insentif Rp.50.000.");
+                if($ns > 1){
+                    $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nSurvei Evaluasi Program Kartu Prakerja telah Tersedia untuk Diisi untuk mendapatkan Insentif Rp.50.000.");
+                }
                 $survey_check[$user_id] = "Y";
             }   
         } else {
@@ -429,11 +453,13 @@ foreach ($list as $value) {
             goto cert_again;
         }
         if(count($cert->data->certification) >= 1 && $cert_user_count[$user_id] <> count($cert->data->certification)){
-            $no_cert=1;$text ="Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut daftar sertifikat kamu pada dashboard prakerja:\n";
+            $no_cert=1;$text ="Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut informasi update daftar sertifikat kamu pada dashboard prakerja:\n";
             foreach ($cert->data->certification as $certification) {
                 $text = $text."[".$no_cert++."] ".$certification->course_name." (".$certification->institute_name.")\n";
             }
-            $prakerja->send_message($token, $chat_id_array, $text);
+            if($ns > 1){
+                $prakerja->send_message($token, $chat_id_array, $text);
+            }
         }
         $cert_user_count[$user_id] = count($cert->data->certification);
 
@@ -452,7 +478,7 @@ foreach ($list as $value) {
             $no_jd=1; 
             unset($text);
             if($incentive_user[$user_id] != count($incentive->data->items)){
-                $text = "Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut informasi jadwal insentif kamu:\n";
+                $text = "Program Prakerja:\n\nHi ".$user_fullname.",\nBerikut informasi update jadwal insentif kamu:\n";
             }
             foreach ($incentive->data->items as $all_incentive) {
                 switch($all_incentive->status){
@@ -485,16 +511,18 @@ foreach ($list as $value) {
                     break;
                 }
                 if(isset($status_incentive[$user_id][$all_incentive->code]) && $status_incentive[$user_id][$all_incentive->code] != $incentive_status){
-                    $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->due_date), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status dari ".strtoupper($status_incentive[$user_id][$all_incentive->code])." menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
+                    if($ns > 1){
+                        $prakerja->send_message($token, $chat_id_array, "Program Prakerja:\n\nHi ".$user_fullname.",\nStatus Insentif Rp. ".number_format($all_incentive->amount)." yang dijadwalkan pada ".date_format(date_create($all_incentive->dueDate), 'd M Y')." dengan kode ".$all_incentive->code." telah berubah status dari ".strtoupper($status_incentive[$user_id][$all_incentive->code])." menjadi ".strtoupper($incentive_status)."\nAyo cek sekarang!");
+                    }
                 }
                 $status_incentive[$user_id][$all_incentive->code] = $incentive_status;
 
                 if($incentive_user[$user_id] != count($incentive->data->items)){
-                    $text = $text."[".$no_jd++."] Rp. ".number_format($all_incentive->amount)." - ".date_format(date_create($all_incentive->due_date), 'd M Y')." - ".$incentive_status."\n";
+                    $text = $text."[".$no_jd++."] Rp. ".number_format($all_incentive->amount)." - ".date_format(date_create($all_incentive->dueDate), 'd M Y')." - ".$incentive_status."\n";
                 }  
             }
             $incentive_user[$user_id] = count($incentive->data->items);
-            if(isset($text)){
+            if(!empty($text) && $ns>1){
                 $prakerja->send_message($token, $chat_id_array, $text);
             }
         }
@@ -507,6 +535,7 @@ foreach ($list as $value) {
         fwrite($fh, $chat_id.';'.$email.';'.$password.';'.$auth_token."\n");
         fclose($fh);
     }
+    echo "\n";
 }
 
 if(file_exists('akun.CSV')){
@@ -517,12 +546,13 @@ if(file_exists('akun.CSV')){
 
 if(date('G') <= 6) { //rule jam 12 malam - 6 pagi
     $minutes = SLEEP_IN_MINUTES*3; //jeda = 3 x SLEEP_IN_MINUTES
-} elseif(date('G') <= 17) { //rule jam 6 pagi - 3 sore
+} elseif(date('G') <= 17) { //rule jam 6 pagi - 5 sore
     $minutes = SLEEP_IN_MINUTES; //jeda = normal SLEEP_IN_MINUTES
-} else { //rule jam 3 sore - 12 malam
+} else { //rule jam 5 sore - 12 malam
     $minutes = SLEEP_IN_MINUTES*2; //jeda = 2 x SLEEP_IN_MINUTES
 }
 echo "\nSleep ".$minutes." minutes..";
 sleep(60*$minutes);
 print "\n\n".chr(27).chr(91).'H'.chr(27).chr(91).'J'."\n";
+$ns++;
 goto start;
